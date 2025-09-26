@@ -39,7 +39,7 @@ Durante el juego, el jugador debe recolectar 'monedas' que representan la adquis
 ### 🕹️ Controles
 
 * **Flecha Izquierda (◀️) / Derecha (▶️):** Movimiento horizontal del personaje.
-* **Flecha Arriba (▲):** Salto.
+* **Flecha Arriba (🔼):** Salto.
 
 ### 🚧 Elementos del Nivel
 
