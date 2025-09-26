@@ -59,17 +59,17 @@
         <h1 class="text-4xl mb-4 text-[#e94560]">Crypto Ley</h1>
         <h2 class="text-2xl mb-8">El Desafío del Abogado Digital</h2>
         <p class="mb-6">¡Ayuda al abogado(a) a navegar el mundo cripto!</p>
-        <p class="mb-8">Usa las flechas ◀️▶️ para moverte y ▲ para saltar.</p>
+        <p class="mb-8">Usa las flechas ◀️▶️ para moverte y 🔼 para saltar.</p>
         <div class="mb-8">
             <h3 class="mb-4">Elige tu personaje:</h3>
             <div class="flex justify-center gap-8">
                 <button id="select-male" class="p-4 border-4 border-transparent hover:border-white focus:border-white rounded-lg">
                     <svg width="64" height="64" viewBox="0 0 24 24"><path fill="#f0f0f0" d="M9 4h6v2H9z"/><path fill="#3a3a3a" d="M10 6h4v3h-4z"/><path fill="#d2b48c" d="M10 9h4v2h-4z"/><path fill="#f0f0f0" d="M9 11h6v3H9z"/><path fill="#3a3a3a" d="M10 14h1v4h-1zm3 0h1v4h-1z"/><path fill="#654321" d="M10 18h1v2h-1zm3 0h1v2h-1z"/></svg>
-                    <p>Abogado</p>
+                    <p>Abogada</p>
                 </button>
                 <button id="select-female" class="p-4 border-4 border-transparent hover:border-white focus:border-white rounded-lg">
                      <svg width="64" height="64" viewBox="0 0 24 24"><path fill="#3a3a3a" d="M9 4h6v3H9z"/><path fill="#d2b48c" d="M9 7h6v2H9z"/><path fill="#f0f0f0" d="M8 9h8v3H8z"/><path fill="#3a3a3a" d="M9 12h2v5H9zm4 0h2v5h-2z"/><path fill="#654321" d="M9 17h2v2H9zm4 0h2v2h-2z"/></svg>
-                     <p>Abogada</p>
+                     <p>Abogado</p>
                 </button>
             </div>
         </div>
@@ -78,10 +78,10 @@
     
     <div id="game-container" class="hidden w-full h-full flex flex-col items-center justify-center">
         <div id="hud" class="w-full max-w-4xl p-4 flex flex-col items-center info-hud">
-            <div id="score" class="text-2xl mb-2">Conocimiento: 0</div>
-            <div id="info-display" class="text-sm text-center text-yellow-300 h-16 opacity-0"></div>
+            <div id="score" class="text-2xl mb-2 fixed bottom-10">Conocimiento: 0</div>
+            <div id="info-display" class="text-sm text-center text-yellow-300 h-32 opacity-0 h-screen"></div>
         </div>
-        <canvas id="gameCanvas" width="800" height="600" class="max-w-4xl w-full"></canvas>
+        <canvas id="gameCanvas" width="800" height="600" class="max-w-4xl w-full "></canvas>
     </div>
 
     <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
@@ -114,7 +114,7 @@
 
         // --- DATOS EXTRAÍDOS DEL DOCUMENTO ---
         const COIN_FACTS = [
-            { title: "Clasificación (UE)", text: "La UE clasifica criptos en: e-money tokens, asset-referenced tokens y utility tokens." },
+            { title: "Qué herramientas tecnológicas de la Cuarta Revolución Industrial impactan la manera de adquirir productos y servicios", text: "El internet de las cosas, el machine learning, el blockchain, la nube y la computación en el borde." },
             { title: "Reto: Territorialidad", text: "Es difícil aplicar la ley colombiana a proveedores de cripto sin domicilio en el país." },
             { title: "Principio Clave", text: "Se busca una regulación de 'misma actividad, mismo riesgo, misma regulación'." },
             { title: "Cripto como 'Commodity'", text: "En EE.UU., son 'commodities' si se usan en contratos de futuros (según la CFTC)." },
@@ -261,7 +261,7 @@
             ctx.beginPath(); ctx.arc(goal.x + 55, goal.y + 20, 10, 0, Math.PI); ctx.fill();
         }
 
-        function showInfoMessage(text, duration = 6000) {
+        function showInfoMessage(text, duration = 10000) {
             clearTimeout(infoTimeout);
             infoDisplay.textContent = text;
             infoDisplay.style.opacity = 1;
