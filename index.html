@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Ley: El Desafío del Abogado Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="icon" href="/sources/favicon.png" type="image/png">
+    <style>
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+        canvas {
+            background-color: #16213e;
+            display: block;
+            margin: 0 auto;
+            border: 4px solid #0f3460;
+        }
+        .pixel-button {
+            background-color: #e94560;
+            border: none;
+            padding: 15px 30px;
+            color: white;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #b32e48;
+            transition: all 0.1s ease-in-out;
+        }
+        .pixel-button:active {
+            transform: translateY(5px);
+            box-shadow: 0 0px 0 #b32e48;
+        }
+        .modal-content {
+            box-shadow: 
+                0 0 0 4px #16213e,
+                0 0 0 8px #e0e0e0;
+        }
+        .info-hud {
+             text-shadow: 2px 2px #000;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center h-screen">
+
+    <div id="start-screen" class="text-center p-8">
+        <h1 class="text-4xl mb-4 text-[#e94560]">Crypto Ley</h1>
+        <h2 class="text-2xl mb-8">El Desafío del Abogado Digital</h2>
+        <p class="mb-6">¡Ayuda al abogado(a) a navegar el mundo cripto!</p>
+        <p class="mb-8">Usa las flechas ◀️▶️ para moverte y ▲ para saltar.</p>
+        <div class="mb-8">
+            <h3 class="mb-4">Elige tu personaje:</h3>
+            <div class="flex justify-center gap-8">
+                <button id="select-male" class="p-4 border-4 border-transparent hover:border-white focus:border-white rounded-lg">
+                    <svg width="64" height="64" viewBox="0 0 24 24"><path fill="#f0f0f0" d="M9 4h6v2H9z"/><path fill="#3a3a3a" d="M10 6h4v3h-4z"/><path fill="#d2b48c" d="M10 9h4v2h-4z"/><path fill="#f0f0f0" d="M9 11h6v3H9z"/><path fill="#3a3a3a" d="M10 14h1v4h-1zm3 0h1v4h-1z"/><path fill="#654321" d="M10 18h1v2h-1zm3 0h1v2h-1z"/></svg>
+                    <p>Abogada</p>
+                </button>
+                <button id="select-female" class="p-4 border-4 border-transparent hover:border-white focus:border-white rounded-lg">
+                     <svg width="64" height="64" viewBox="0 0 24 24"><path fill="#3a3a3a" d="M9 4h6v3H9z"/><path fill="#d2b48c" d="M9 7h6v2H9z"/><path fill="#f0f0f0" d="M8 9h8v3H8z"/><path fill="#3a3a3a" d="M9 12h2v5H9zm4 0h2v5h-2z"/><path fill="#654321" d="M9 17h2v2H9zm4 0h2v2h-2z"/></svg>
+                     <p>Abogado</p>
+                </button>
+            </div>
+        </div>
+        <button id="start-button" class="pixel-button">Empezar Juego</button>
+    </div>
+    
+    <div id="game-container" class="hidden w-full h-full flex flex-col items-center justify-center">
+        <div id="hud" class="w-full max-w-4xl p-4 flex justify-between items-center info-hud">
+            <div id="score" class="text-2xl">Conocimiento: 0</div>
+             <div id="message-display" class="text-xl text-center text-[#e94560] absolute left-1/2 -translate-x-1/2 top-4"></div>
+        </div>
+        <canvas id="gameCanvas" width="800" height="600" class="max-w-4xl w-full"></canvas>
+    </div>
+
+    <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+        <div class="modal-content bg-[#1a1a2e] text-white p-8 rounded-lg max-w-xl text-center border-4 border-[#e0e0e0]">
+            <h2 id="modal-title" class="text-2xl mb-4 text-[#e94560]"></h2>
+            <p id="modal-text" class="mb-6"></p>
+            <button id="modal-close-button" class="pixel-button">Continuar</button>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURACIÓN INICIAL ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const startScreen = document.getElementById('start-screen');
+        const gameContainer = document.getElementById('game-container');
+        const startButton = document.getElementById('start-button');
+        const scoreElement = document.getElementById('score');
+        const messageDisplay = document.getElementById('message-display');
+
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalText = document.getElementById('modal-text');
+        const modalCloseButton = document.getElementById('modal-close-button');
+
+        let gamePaused = false;
+        let score = 0;
+        let selectedPlayer = 'male';
+
+        // --- DATOS EXTRAÍDOS DEL DOCUMENTO ---
+        const COIN_FACTS = [
+            { title: "Clasificación de Criptoactivos (UE)", text: "La Unión Europea, en su reglamento MICA, identifica tipos como: fichas de dinero electrónico (e-money token), tokens referenciados a activos (asset-referenced token) y criptoactivos de utilidad (utility tokens)." },
+            { title: "Reto: Territorialidad de la Ley", text: "Un desafío legal en Colombia es aplicar el Estatuto del Consumidor a proveedores de criptoactivos sin domicilio o sucursal en el país, lo que dificulta la protección." },
+            { title: "Principio Regulatorio Clave", text: "La recomendación internacional es 'misma actividad, mismo riesgo, misma regulación', buscando que las normas se adapten a la función del criptoactivo, no a su tecnología." },
+            { title: "Criptoactivos como 'Commodities'", text: "En EE.UU., la CFTC considera los criptoactivos como 'commodities' si se utilizan en contratos de futuros, aplicando la Ley de Bolsa de Productos Básicos (CEA)." },
+            { title: "Criptoactivos como 'Valores'", text: "La SEC (EE.UU.) los considera 'valores' si cumplen el Test de Howey: 1) inversión de dinero, 2) en una empresa común, 3) con expectativa de ganancias, 4) por el esfuerzo de otros." },
+            { title: "Reto: Organizaciones Descentralizadas (DAO)", text: "Las DAO operan sin una estructura societaria tradicional. Esto representa un vacío legal en Colombia para determinar la responsabilidad frente a los consumidores." },
+            { title: "Blockchain: El Libro Digital", text: "Blockchain es un libro de contabilidad digital donde se registran datos y transacciones de forma segura y descentralizada entre múltiples actores, usando criptografía." },
+            { title: "Protección al Consumidor en Colombia", text: "Según la Ley 1480 de 2011, si un consumidor adquiere un bien o servicio con criptoactivos para su necesidad final, las normas de protección deberían ser aplicables." },
+            { title: "Dificultad en Reversión de Pagos", text: "A diferencia de los pagos con tarjeta, las transacciones con criptoactivos en redes descentralizadas son a menudo irreversibles, lo que complica la protección del consumidor en casos de fraude." },
+            { title: "El Papel del 'Contrato Inteligente'", text: "Son protocolos informáticos que ejecutan automáticamente acuerdos cuando se cumplen ciertas condiciones, eliminando la necesidad de intermediarios en muchas transacciones." }
+        ];
+
+        const ENEMY_RISKS = {
+            volatility: { title: "¡Peligro: Volatilidad!", text: "Los criptoactivos sin respaldo no tienen valor intrínseco. Su precio es muy volátil, exponiendo a los consumidores a un alto riesgo de pérdidas económicas significativas y repentinas." },
+            scam: { title: "¡Cuidado: Estafa!", text: "Esquemas Ponzi y otras estafas usan criptoactivos para dar apariencia de legalidad a dineros ilícitos. Prometen altas rentabilidades con bajo riesgo para atraer inversionistas." },
+            anonymity: { title: "¡Riesgo: Anonimato Ilícito!", text: "Algunas criptomonedas y 'mezcladores' (mixers) dificultan el rastreo de las transacciones, lo que puede ser aprovechado para el lavado de activos y otras actividades delictivas." },
+            legal_gap: { title: "¡Alerta: Vacío Legal!", text: "La falta de una regulación específica y clara sobre criptoactivos en muchas jurisdicciones crea incertidumbre y desprotección para los consumidores e inversionistas." }
+        };
+
+        // --- DEFINICIÓN DE OBJETOS DEL JUEGO ---
+        const gravity = 0.5;
+        const player = {
+            x: 50, y: 500, width: 32, height: 48,
+            vx: 0, vy: 0, speed: 5, jumpPower: -12,
+            isJumping: false,
+            draw: function() {
+                ctx.fillStyle = '#d2b48c'; // Skin
+                if (selectedPlayer === 'male') {
+                    // Cuerpo (traje)
+                    ctx.fillStyle = '#3a3a3a';
+                    ctx.fillRect(this.x, this.y + 10, this.width, this.height - 10);
+                    // Camisa blanca
+                    ctx.fillStyle = '#f0f0f0';
+                    ctx.fillRect(this.x + 10, this.y + 10, this.width - 20, 10);
+                    // Cabeza
+                    ctx.fillStyle = '#d2b48c';
+                    ctx.fillRect(this.x + 4, this.y, this.width - 8, 10);
+                    // Pelo
+                    ctx.fillStyle = '#3a3a3a';
+                    ctx.fillRect(this.x + 4, this.y, this.width - 8, 4);
+                } else {
+                    // Cuerpo (traje)
+                    ctx.fillStyle = '#3a3a3a';
+                    ctx.fillRect(this.x, this.y + 12, this.width, this.height - 12);
+                     // Blusa blanca
+                    ctx.fillStyle = '#f0f0f0';
+                    ctx.fillRect(this.x + 4, this.y + 12, this.width - 8, 8);
+                    // Cabeza
+                    ctx.fillStyle = '#d2b48c';
+                    ctx.fillRect(this.x + 4, this.y, this.width - 8, 12);
+                    // Pelo
+                    ctx.fillStyle = '#3a3a3a';
+                    ctx.fillRect(this.x + 2, this.y, this.width - 4, 8);
+                }
+            }
+        };
+
+        const keys = {
+            right: false,
+            left: false,
+            up: false
+        };
+        
+        let platforms = [];
+        let coins = [];
+        let enemies = [];
+        let goal = {};
+
+        // --- FUNCIONES DEL JUEGO ---
+
+        function createWorld() {
+            score = 0;
+            updateScore();
+            player.x = 50;
+            player.y = 500;
+            player.vy = 0;
+            
+            platforms = [
+                // Suelo inicial
+                { x: 0, y: 580, width: 400, height: 20 },
+                // Plataformas
+                { x: 250, y: 480, width: 150, height: 20 },
+                { x: 500, y: 400, width: 200, height: 20 },
+                { x: 300, y: 300, width: 120, height: 20 },
+                { x: 100, y: 220, width: 150, height: 20 },
+                { x: 400, y: 150, width: 180, height: 20 },
+                { x: 700, y: 500, width: 250, height: 20 },
+                { x: 1000, y: 420, width: 200, height: 20 },
+                { x: 1300, y: 350, width: 150, height: 20 },
+                { x: 1100, y: 250, width: 150, height: 20 },
+                { x: 1500, y: 480, width: 400, height: 20 },
+                { x: 1600, y: 300, width: 100, height: 20 },
+                // Suelo final
+                { x: 2000, y: 580, width: 400, height: 20 },
+            ];
+
+            coins = [
+                { x: 300, y: 440, size: 20, collected: false, info: COIN_FACTS[0] },
+                { x: 550, y: 360, size: 20, collected: false, info: COIN_FACTS[1] },
+                { x: 350, y: 260, size: 20, collected: false, info: COIN_FACTS[2] },
+                { x: 150, y: 180, size: 20, collected: false, info: COIN_FACTS[3] },
+                { x: 480, y: 110, size: 20, collected: false, info: COIN_FACTS[4] },
+                { x: 800, y: 460, size: 20, collected: false, info: COIN_FACTS[5] },
+                { x: 1050, y: 380, size: 20, collected: false, info: COIN_FACTS[6] },
+                { x: 1350, y: 310, size: 20, collected: false, info: COIN_FACTS[7] },
+                { x: 1150, y: 210, size: 20, collected: false, info: COIN_FACTS[8] },
+                { x: 1700, y: 440, size: 20, collected: false, info: COIN_FACTS[9] },
+            ];
+
+            enemies = [
+                // Volatilidad (picos)
+                { x: 600, y: 380, width: 30, height: 20, type: 'volatility' },
+                // Estafa (pirámide)
+                { x: 1400, y: 330, width: 20, height: 20, type: 'scam' },
+                 // Vacío Legal (interrogación)
+                { x: 1800, y: 460, width: 20, height: 20, type: 'legal_gap' },
+                // Anonimato (fantasma)
+                { x: 850, y: 480, width: 20, height: 20, type: 'anonymity' }
+            ];
+
+            goal = { x: 2200, y: 500, width: 60, height: 80 };
+            
+            // Ajustar el canvas al tamaño del mundo
+            canvas.width = 2400;
+        }
+
+        function drawPlatforms() {
+            ctx.fillStyle = '#0f3460';
+            platforms.forEach(p => {
+                ctx.fillRect(p.x, p.y, p.width, p.height);
+            });
+        }
+        
+        function drawCoins() {
+            coins.forEach(coin => {
+                if (!coin.collected) {
+                    ctx.beginPath();
+                    ctx.arc(coin.x + coin.size / 2, coin.y + coin.size / 2, coin.size / 2, 0, Math.PI * 2);
+                    ctx.fillStyle = '#ffd700';
+                    ctx.fill();
+                    ctx.fillStyle = '#e0a800';
+                    ctx.font = `${coin.size*0.8}px "Press Start 2P"`;
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText('C', coin.x + coin.size / 2, coin.y + coin.size / 2 + 2);
+                }
+            });
+        }
+
+        function drawEnemies() {
+            enemies.forEach(e => {
+                ctx.fillStyle = '#ff414d';
+                if (e.type === 'volatility') {
+                    ctx.beginPath();
+                    ctx.moveTo(e.x, e.y + e.height);
+                    ctx.lineTo(e.x + e.width / 2, e.y);
+                    ctx.lineTo(e.x + e.width, e.y + e.height);
+                    ctx.closePath();
+                    ctx.fill();
+                } else if (e.type === 'scam') {
+                     ctx.beginPath();
+                    ctx.moveTo(e.x + e.width / 2, e.y);
+                    ctx.lineTo(e.x + e.width, e.y + e.height);
+                    ctx.lineTo(e.x, e.y + e.height);
+                    ctx.closePath();
+                    ctx.fill();
+                } else if (e.type === 'legal_gap') {
+                    ctx.font = '24px "Press Start 2P"';
+                    ctx.fillText('?', e.x, e.y + e.height);
+                } else if (e.type === 'anonymity') {
+                    ctx.beginPath();
+                    ctx.arc(e.x + e.width/2, e.y + e.height/2, e.width/2, Math.PI, 0);
+                    ctx.lineTo(e.x + e.width, e.y + e.height);
+                    ctx.lineTo(e.x, e.y + e.height);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            });
+        }
+
+        function drawGoal() {
+            // Dibuja una balanza de la justicia como meta
+            ctx.fillStyle = '#c0c0c0';
+            // Base
+            ctx.fillRect(goal.x + 10, goal.y + 60, 40, 20);
+            // Columna
+            ctx.fillRect(goal.x + 25, goal.y, 10, 60);
+            // Brazo
+            ctx.fillRect(goal.x, goal.y, 60, 10);
+            // Platos
+            ctx.beginPath();
+            ctx.arc(goal.x + 5, goal.y + 20, 10, 0, Math.PI);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(goal.x + 55, goal.y + 20, 10, 0, Math.PI);
+            ctx.fill();
+        }
+
+        function showMessage(text, duration = 2000) {
+            messageDisplay.textContent = text;
+            setTimeout(() => {
+                messageDisplay.textContent = '';
+            }, duration);
+        }
+
+        function showModal(title, text) {
+            gamePaused = true;
+            modalTitle.textContent = title;
+            modalText.textContent = text;
+            modal.classList.remove('hidden');
+        }
+
+        function hideModal() {
+            modal.classList.add('hidden');
+            gamePaused = false;
+            // Reinicia el bucle de juego si se pausó
+            requestAnimationFrame(gameLoop);
+        }
+
+        function resetGame() {
+            createWorld();
+        }
+
+        function updateScore() {
+            scoreElement.textContent = `Conocimiento: ${score}`;
+        }
+        
+        function update() {
+            if (gamePaused) return;
+
+            // Movimiento horizontal
+            if (keys.right) {
+                player.vx = player.speed;
+            } else if (keys.left) {
+                player.vx = -player.speed;
+            } else {
+                player.vx = 0;
+            }
+
+            // Salto
+            if (keys.up && !player.isJumping) {
+                player.vy = player.jumpPower;
+                player.isJumping = true;
+            }
+
+            // Aplicar velocidad y gravedad
+            player.x += player.vx;
+            player.vy += gravity;
+            player.y += player.vy;
+            player.isJumping = true; 
+
+            // Colisiones con plataformas
+            platforms.forEach(p => {
+                if (player.x < p.x + p.width && player.x + player.width > p.x &&
+                    player.y < p.y + p.height && player.y + player.height > p.y) {
+                    
+                    // Colisión desde arriba
+                    if (player.vy > 0 && player.y + player.height - player.vy <= p.y) {
+                        player.y = p.y - player.height;
+                        player.vy = 0;
+                        player.isJumping = false;
+                    }
+                    // Colisión desde abajo
+                    else if (player.vy < 0 && player.y - player.vy >= p.y + p.height) {
+                         player.y = p.y + p.height;
+                         player.vy = 0;
+                    }
+                    // Colisión lateral
+                    else if (player.x + player.width > p.x && player.x < p.x + p.width) {
+                       if (player.vx > 0) player.x = p.x - player.width;
+                       else if (player.vx < 0) player.x = p.x + p.width;
+                    }
+                }
+            });
+
+            // Colisiones con monedas
+            coins.forEach(coin => {
+                if (!coin.collected && player.x < coin.x + coin.size && player.x + player.width > coin.x &&
+                    player.y < coin.y + coin.size && player.y + player.height > coin.y) {
+                    coin.collected = true;
+                    score++;
+                    updateScore();
+                    showModal(coin.info.title, coin.info.text);
+                }
+            });
+
+            // Colisiones con enemigos
+            enemies.forEach(e => {
+                 if (player.x < e.x + e.width && player.x + player.width > e.x &&
+                    player.y < e.y + e.height && player.y + player.height > e.y) {
+                    const risk = ENEMY_RISKS[e.type];
+                    showModal(risk.title, risk.text);
+                    resetGame();
+                }
+            });
+
+            // Colisión con la meta
+            if (player.x < goal.x + goal.width && player.x + player.width > goal.x &&
+                player.y < goal.y + goal.height && player.y + player.height > goal.y) {
+                if (score === coins.length) {
+                    showModal("¡Felicitaciones!", "Has dominado los conceptos clave de las criptomonedas en el derecho. ¡Caso cerrado con éxito!");
+                    resetGame();
+                } else {
+                    showMessage(`Necesitas ${coins.length - score} puntos más de conocimiento.`);
+                }
+            }
+
+            // Caída fuera del mapa
+            if (player.y > canvas.height) {
+                showModal("¡Cuidado!", "Has caído en un vacío de incertidumbre. Es importante mantenerse sobre bases legales firmes.");
+                resetGame();
+            }
+        }
+        
+        function draw() {
+            // Limpiar canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Mover cámara
+            ctx.save();
+            let camX = -player.x + gameContainer.clientWidth / 2;
+            camX = Math.min(0, camX); // Evitar que la cámara se mueva más allá del inicio
+            camX = Math.max(gameContainer.clientWidth - canvas.width, camX); // Evitar que la cámara se mueva más allá del final
+            ctx.translate(camX, 0);
+
+            // Dibujar fondo (simulando columnas de justicia y circuitos)
+            for(let i=0; i < canvas.width; i += 100) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+                ctx.fillRect(i, 0, 10, canvas.height); // Columnas
+                ctx.fillRect(i + 50, 0, 2, Math.random() * canvas.height); // Circuitos
+            }
+
+            drawPlatforms();
+            drawCoins();
+            drawEnemies();
+            drawGoal();
+            player.draw();
+
+            ctx.restore();
+        }
+
+        function gameLoop() {
+            if (gamePaused) return;
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // --- MANEJO DE EVENTOS ---
+        function handleKeyDown(e) {
+            if (e.key === 'ArrowRight') keys.right = true;
+            if (e.key === 'ArrowLeft') keys.left = true;
+            if (e.key === 'ArrowUp') keys.up = true;
+        }
+
+        function handleKeyUp(e) {
+            if (e.key === 'ArrowRight') keys.right = false;
+            if (e.key === 'ArrowLeft') keys.left = false;
+            if (e.key === 'ArrowUp') keys.up = false;
+        }
+
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keyup', handleKeyUp);
+        
+        modalCloseButton.addEventListener('click', hideModal);
+
+        document.getElementById('select-male').addEventListener('click', () => {
+            selectedPlayer = 'male';
+            document.getElementById('select-male').classList.add('border-white');
+            document.getElementById('select-female').classList.remove('border-white');
+        });
+        document.getElementById('select-female').addEventListener('click', () => {
+            selectedPlayer = 'female';
+            document.getElementById('select-female').classList.add('border-white');
+            document.getElementById('select-male').classList.remove('border-white');
+        });
+
+        startButton.addEventListener('click', () => {
+            startScreen.classList.add('hidden');
+            gameContainer.classList.remove('hidden');
+            createWorld();
+            gameLoop();
+        });
+
+    </script>
+
+</body>
+</html>
