@@ -208,9 +208,9 @@
 
             enemies = [
                 { x: 600, y: 380, width: 30, height: 20, type: 'volatility' },
-                { x: 1400, y: 330, width: 20, height: 20, type: 'scam' },
-                { x: 1800, y: 460, width: 20, height: 20, type: 'legal_gap' },
-                { x: 850, y: 480, width: 20, height: 20, type: 'anonymity' }
+                { x: 1400, y: 330, width: 30, height: 20, type: 'scam' },
+                { x: 1800, y: 460, width: 30, height: 20, type: 'legal_gap' },
+                { x: 850, y: 480, width: 30, height: 20, type: 'anonymity' }
             ];
 
             goal = { x: 2200, y: 500, width: 60, height: 80 };
@@ -241,15 +241,13 @@
         function drawEnemies() {
             enemies.forEach(e => {
                 ctx.fillStyle = '#ff414d';
-                if (e.type === 'volatility') {
-                    ctx.beginPath(); ctx.moveTo(e.x, e.y + e.height); ctx.lineTo(e.x + e.width / 2, e.y); ctx.lineTo(e.x + e.width, e.y + e.height); ctx.closePath(); ctx.fill();
-                } else if (e.type === 'scam') {
-                    ctx.beginPath(); ctx.moveTo(e.x + e.width / 2, e.y); ctx.lineTo(e.x + e.width, e.y + e.height); ctx.lineTo(e.x, e.y + e.height); ctx.closePath(); ctx.fill();
-                } else if (e.type === 'legal_gap') {
-                    ctx.font = '24px "Press Start 2P"'; ctx.fillText('?', e.x, e.y + e.height);
-                } else if (e.type === 'anonymity') {
-                    ctx.beginPath(); ctx.arc(e.x + e.width/2, e.y + e.height/2, e.width/2, Math.PI, 0); ctx.lineTo(e.x + e.width, e.y + e.height); ctx.lineTo(e.x, e.y + e.height); ctx.closePath(); ctx.fill();
-                }
+                // Todos los enemigos se dibujan como picos
+                ctx.beginPath();
+                ctx.moveTo(e.x, e.y + e.height);
+                ctx.lineTo(e.x + e.width / 2, e.y);
+                ctx.lineTo(e.x + e.width, e.y + e.height);
+                ctx.closePath();
+                ctx.fill();
             });
         }
 
