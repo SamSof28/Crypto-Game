@@ -2,8 +2,14 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Language" content="es">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Ley: El Desafío del Abogado Digital</title>
+    <meta name="description" content="Videojuego educativo sobre criptoactivos y derecho, desarrollado por estudiantes de la Universidad de Medellín. Aprende sobre blockchain, riesgos y regulación jugando.">
+    <meta name="keywords" content="cripto, blockchain, derecho, videojuego, educación, regulación, Colombia, consumidor, gamificación, ABJ, Universidad de Medellín">
+    <meta name="author" content="Equipo Crypto Ley - Universidad de Medellín">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="robots" content="index, follow">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="icon" href="sources/favicon.ico" type="image/x-icon">
@@ -53,8 +59,9 @@
         }
     </style>
 </head>
-<body class="flex items-center justify-center h-screen">
+<body class="flex flex-col min-h-screen bg-[#1a1a2e]">
 
+    <div id="main-content" class="flex-1 flex flex-col items-center justify-center">
     <div id="start-screen" class="text-center p-8">
         <h1 class="text-4xl mb-4 text-[#e94560]">Crypto Ley</h1>
         <h2 class="text-2xl mb-8">El Desafío del Abogado Digital</h2>
@@ -91,6 +98,11 @@
             <button id="modal-close-button" class="pixel-button">Jugar de Nuevo</button>
         </div>
     </div>
+
+    <footer id="main-footer" class="w-full text-center text-sm text-gray-400 p-4 mt-auto">
+    <p>Desarrollado por estudiantes de la <a href="https://www.udem.edu.co" class="underline hover:text-white" target="_blank" rel="noopener">Universidad de Medellín</a> con 💖</p>
+    <p>© 2025 Crypto Ley. Todos los derechos reservados.</p>
+    </footer>
 
     <script>
         // --- CONFIGURACIÓN INICIAL ---
@@ -279,7 +291,10 @@
             modal.classList.add('hidden');
             gamePaused = false;
             resetGame();
-            requestAnimationFrame(gameLoop);
+            // Mostrar pantalla de inicio y footer
+            startScreen.classList.remove('hidden');
+            gameContainer.classList.add('hidden');
+            document.getElementById('main-footer').classList.remove('hidden');
         }
 
         function resetGame() {
@@ -412,11 +427,11 @@
         startButton.addEventListener('click', () => {
             startScreen.classList.add('hidden');
             gameContainer.classList.remove('hidden');
+            document.getElementById('main-footer').classList.add('hidden');
             createWorld();
             gameLoop();
         });
 
     </script>
-
 </body>
 </html>
