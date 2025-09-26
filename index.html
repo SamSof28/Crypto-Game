@@ -126,23 +126,23 @@
 
         // --- DATOS EXTRAÍDOS DEL DOCUMENTO ---
         const COIN_FACTS = [
-            { title: "Qué herramientas tecnológicas de la Cuarta Revolución Industrial impactan la manera de adquirir productos y servicios", text: "El internet de las cosas, el machine learning, el blockchain, la nube y la computación en el borde." },
-            { title: "Reto: Territorialidad", text: "Es difícil aplicar la ley colombiana a proveedores de cripto sin domicilio en el país." },
-            { title: "Principio Clave", text: "Se busca una regulación de 'misma actividad, mismo riesgo, misma regulación'." },
-            { title: "Cripto como 'Commodity'", text: "En EE.UU., son 'commodities' si se usan en contratos de futuros (según la CFTC)." },
-            { title: "Cripto como 'Valor'", text: "En EE.UU., son 'valores' si pasan el Test de Howey (inversión, empresa común, expectativa de ganancia)." },
-            { title: "Reto: DAOs", text: "Las Organizaciones Autónomas Descentralizadas (DAO) operan sin estructura legal tradicional, creando un vacío de responsabilidad." },
-            { title: "Blockchain", text: "Es un libro de contabilidad digital, descentralizado y seguro para registrar transacciones." },
-            { title: "Protección al Consumidor", text: "La Ley 1480 de 2011 debería aplicar si se usan criptos para adquirir un bien o servicio para consumo final." },
-            { title: "Irreversibilidad", text: "Las transacciones en blockchain son a menudo irreversibles, dificultando la protección en caso de fraude." },
-            { title: "Contratos Inteligentes", text: "Son protocolos que ejecutan acuerdos automáticamente sin necesidad de intermediarios." }
+            { title: "¿De Donde Surgen los Criptoactivos?", text: "La blockchain funciona como un libro digital donde se registran datos. Ha sido precisamente esta tecnología la que ha impulsado la creación de criptoactivos para que se puedan realizar transacciones." },
+            { title: "¿Y que son los Criptoactivos?", text: "Los criptoactivos, son activos digitales cuya creación ha sido impulsada por la tecnología blockchain para la realización de transacciones." },
+            { title: "¿Cómo se clasifican globalmente los criptoactivos (ej. Reino Unido)?", text: "Generalmente como medio de intercambio, valores o de utilidad (utility token)." },
+            { title: "¿Cuál es el principio regulatorio clave adoptado por Colombia?", text: "El principio de 'misma actividad, mismo riesgo y misma regulación" },
+            { title: "¿Qué retos regulatorios genera la descentralización de la blockchain?", text: "Dificultad para determinar la zona geográfica o jurisdicción de los sistemas de registro distribuidos" },
+            { title: "¿Existe legislación específica en Colombia sobre criptoactivos o su uso como pago electrónico?", text: "No existe legislación específica ni se reconocen como instrumento de pago electrónico" },
+            { title: "¿Qué entidades colombianas (Superfinanciera, DIAN, SIC) están llamadas a supervisar los criptoactivos?", text: "Entidades como el Banco de la República, la Superintendencia Financiera, la UIAF y la Superintendencia de Industria y Comercio" },
+            { title: "¿Cómo aplica el principio de territorialidad (Ley 1480 de 2011) a las transacciones cripto?", text: "La Ley 1480 de 2011 debería aplicar si se usan criptos para adquirir un bien o servicio para consumo final." },
+            { title: "¿Se aplica el derecho de retracto y reversión de pago a los criptoactivos en Colombia?", text: "Sí, aplica el derecho de retracto si el servicio no se ha consumido o ejecutado antes de cinco (5) días" },
+            { title: "¿Cómo impacta la ley colombiana la ausencia de reconocimiento de figuras como las DAO?", text: "Genera desafíos en la identificación de los participantes y el marco contractual, pues no se reconocen personas naturales que ejercen estas actividades sin figura societaria formal" }
         ];
 
         const ENEMY_RISKS = {
             volatility: { title: "¡Peligro: Volatilidad!", text: "Los precios de criptoactivos sin respaldo pueden caer drásticamente, generando grandes pérdidas." },
             scam: { title: "¡Cuidado: Estafa!", text: "Esquemas Ponzi usan criptomonedas para atraer víctimas con promesas de alta rentabilidad." },
-            anonymity: { title: "¡Riesgo: Anonimato!", text: "El anonimato en algunas redes puede facilitar el lavado de activos y otras actividades ilícitas." },
-            legal_gap: { title: "¡Alerta: Vacío Legal!", text: "La falta de regulación específica genera incertidumbre y desprotección para los consumidores." }
+            anonymity: { title: "¡Riesgo: Anonimato!", text: "Hay brechas de datos por la poca confiabilidad en la geolocalización, incrementando los riesgos de fraude, seguridad y lavado de activos." },
+            legal_gap: { title: "¡Alerta: Vacío Legal!", text: "No existe legislación específica en Colombia, generando una brecha de protección. Tampoco se reconocen como instrumento de pago electrónico." }
         };
 
         // --- DEFINICIÓN DE OBJETOS DEL JUEGO ---
@@ -271,7 +271,7 @@
             ctx.beginPath(); ctx.arc(goal.x + 55, goal.y + 20, 10, 0, Math.PI); ctx.fill();
         }
 
-        function showInfoMessage(text, duration = 10000) {
+        function showInfoMessage(text, duration = 15000) {
             clearTimeout(infoTimeout);
             infoDisplay.textContent = text;
             infoDisplay.style.opacity = 1;
@@ -365,7 +365,7 @@
             }
 
             if (player.y > canvas.height + 50) {
-                showInfoMessage("Caíste en un vacío de incertidumbre. ¡Bases legales firmes!");
+                showInfoMessage("¡Caíste en la trampa de la volatilidad! Sin regulación y protección legal adecuada, las inversiones en cripto pueden desplomarse rápidamente. Ten mucho cuidado.");
                 resetGame();
             }
         }
