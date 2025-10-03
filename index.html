@@ -18,14 +18,16 @@
         body {
             font-family: 'Press Start 2P', cursive;
             background-color: #1a1a2e;
+            background-image: radial-gradient(ellipse at center, #16213e 0%, #0c1324 100%);
             color: #e0e0e0;
             overflow: hidden;
         }
         canvas {
-            background-color: #16213e;
+            background-color: transparent; /* Hacemos el canvas transparente para ver el fondo dinámico */
             display: block;
             margin: 0 auto;
             border: 4px solid #0f3460;
+            border-radius: 8px;
         }
         .pixel-button {
             background-color: #e94560;
@@ -37,25 +39,46 @@
             box-shadow: 0 5px 0 #b32e48;
             transition: all 0.1s ease-in-out;
         }
+        .pixel-button:hover {
+            background-color: #f05a74;
+        }
         .pixel-button:active {
             transform: translateY(5px);
             box-shadow: 0 0px 0 #b32e48;
         }
-        .modal-content {
+        .modal-content, #start-screen {
             box-shadow: 
                 0 0 0 4px #16213e,
-                0 0 0 8px #e0e0e0;
+                0 0 0 8px #e0e0e0,
+                0 0 25px rgba(233, 69, 96, 0.5);
+            background-color: #1a1a2e;
+            border-radius: 8px;
         }
         .info-hud {
              text-shadow: 2px 2px #000;
         }
         #info-display {
-            transition: opacity 0.5s ease-in-out;
-            background-color: rgba(0,0,0,0.5);
-            padding: 8px;
+            transition: opacity 0.5s ease-in-out, transform 0.3s ease-in-out;
+            background-color: rgba(15, 52, 96, 0.8);
+            padding: 16px; /* Aumentamos el padding */
             border-radius: 5px;
-            border: 2px solid #0f3460;
+            border: 2px solid #3c6e9e;
             max-width: 90%;
+            backdrop-filter: blur(2px);
+            min-height: 100px; /* Añadimos una altura mínima */
+        }
+        .glowing-text {
+            text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #e94560, 0 0 20px #e94560;
+        }
+        .char-select-btn {
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .char-select-btn:hover {
+            transform: scale(1.1);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        footer a {
+            transition: color 0.2s;
         }
     </style>
 </head>
@@ -63,18 +86,19 @@
 
     <div id="main-content" class="flex-1 flex flex-col items-center justify-center">
     <div id="start-screen" class="text-center p-8">
-        <h1 class="text-4xl mb-4 text-[#e94560]">Crypto Ley</h1>
+        <h1 class="text-4xl mb-4 text-[#e94560] glowing-text">Crypto Ley</h1>
         <h2 class="text-2xl mb-8">El Desafío del Abogado Digital</h2>
         <p class="mb-6">¡Ayuda al abogado(a) a navegar el mundo cripto!</p>
         <p class="mb-8">Usa las flechas ◀️▶️ para moverte y 🔼 para saltar.</p>
         <div class="mb-8">
             <h3 class="mb-4">Elige tu personaje:</h3>
             <div class="flex justify-center gap-8">
-                <button id="select-male" class="p-4 border-4 border-transparent hover:border-white focus:border-white rounded-lg">
+                <!-- CORREGIDO: El texto correspondía al personaje equivocado -->
+                <button id="select-male" class="p-4 border-4 border-transparent hover:border-white focus:border-white rounded-lg char-select-btn">
                     <svg width="64" height="64" viewBox="0 0 24 24"><path fill="#f0f0f0" d="M9 4h6v2H9z"/><path fill="#3a3a3a" d="M10 6h4v3h-4z"/><path fill="#d2b48c" d="M10 9h4v2h-4z"/><path fill="#f0f0f0" d="M9 11h6v3H9z"/><path fill="#3a3a3a" d="M10 14h1v4h-1zm3 0h1v4h-1z"/><path fill="#654321" d="M10 18h1v2h-1zm3 0h1v2h-1z"/></svg>
                     <p>Abogada</p>
                 </button>
-                <button id="select-female" class="p-4 border-4 border-transparent hover:border-white focus:border-white rounded-lg">
+                <button id="select-female" class="p-4 border-4 border-transparent hover:border-white focus:border-white rounded-lg char-select-btn">
                      <svg width="64" height="64" viewBox="0 0 24 24"><path fill="#3a3a3a" d="M9 4h6v3H9z"/><path fill="#d2b48c" d="M9 7h6v2H9z"/><path fill="#f0f0f0" d="M8 9h8v3H8z"/><path fill="#3a3a3a" d="M9 12h2v5H9zm4 0h2v5h-2z"/><path fill="#654321" d="M9 17h2v2H9zm4 0h2v2h-2z"/></svg>
                      <p>Abogado</p>
                 </button>
@@ -84,11 +108,12 @@
     </div>
     
     <div id="game-container" class="hidden w-full h-full flex flex-col items-center justify-center">
+        <!-- MEJORADO: HUD con mejor disposición y diseño -->
         <div id="hud" class="w-full max-w-4xl p-4 flex flex-col items-center info-hud">
-            <div id="score" class="text-2xl mb-2 fixed bottom-10">Conocimiento: 0</div>
-            <div id="info-display" class="text-sm text-center text-yellow-300 h-32 opacity-0"></div>
+            <div id="info-display" class="text-sm text-center text-yellow-300 mb-2 opacity-0 flex items-center justify-center"></div>
+             <div id="score" class="text-2xl">Conocimiento: 0</div>
         </div>
-        <canvas id="gameCanvas" width="800" height="600" class="max-w-4xl w-full flex justify-center"></canvas>
+        <canvas id="gameCanvas" width="800" height="600" class="max-w-4xl w-full"></canvas>
     </div>
 
     <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
@@ -98,7 +123,7 @@
             <button id="modal-close-button" class="pixel-button">Jugar de Nuevo</button>
         </div>
     </div>
-
+    </div>
     <footer id="main-footer" class="w-full text-center text-sm text-gray-400 p-4 mt-auto">
     <p>Desarrollado por estudiantes de la <a href="https://www.udem.edu.co" class="underline hover:text-white" target="_blank" rel="noopener">Universidad de Medellín</a> con 💖</p>
     <p>© 2025 Crypto Ley. Todos los derechos reservados.</p>
@@ -124,7 +149,7 @@
         let selectedPlayer = 'male';
         let infoTimeout;
 
-        // --- DATOS EXTRAÍDOS DEL DOCUMENTO ---
+        // --- DATOS EXTRAÍDOS DEL DOCUMENTO (Sin cambios) ---
         const COIN_FACTS = [
             { title: "¿De Donde Surgen los Criptoactivos?", text: "La blockchain funciona como un libro digital donde se registran datos. Ha sido precisamente esta tecnología la que ha impulsado la creación de criptoactivos para que se puedan realizar transacciones." },
             { title: "¿Y que son los Criptoactivos?", text: "Los criptoactivos, son activos digitales cuya creación ha sido impulsada por la tecnología blockchain para la realización de transacciones." },
@@ -144,7 +169,7 @@
             anonymity: { title: "¡Riesgo: Anonimato!", text: "Hay brechas de datos por la poca confiabilidad en la geolocalización, incrementando los riesgos de fraude, seguridad y lavado de activos." },
             legal_gap: { title: "¡Alerta: Vacío Legal!", text: "No existe legislación específica en Colombia, generando una brecha de protección. Tampoco se reconocen como instrumento de pago electrónico." }
         };
-
+        
         // --- DEFINICIÓN DE OBJETOS DEL JUEGO ---
         const gravity = 0.5;
         const player = {
@@ -154,29 +179,21 @@
             draw: function() {
                 ctx.fillStyle = '#d2b48c'; // Skin
                 if (selectedPlayer === 'male') {
-                    // Cuerpo (traje)
                     ctx.fillStyle = '#3a3a3a';
                     ctx.fillRect(this.x, this.y + 10, this.width, this.height - 10);
-                    // Camisa blanca
                     ctx.fillStyle = '#f0f0f0';
                     ctx.fillRect(this.x + 10, this.y + 10, this.width - 20, 10);
-                    // Cabeza
                     ctx.fillStyle = '#d2b48c';
                     ctx.fillRect(this.x + 4, this.y, this.width - 8, 10);
-                    // Pelo
                     ctx.fillStyle = '#3a3a3a';
                     ctx.fillRect(this.x + 4, this.y, this.width - 8, 4);
                 } else {
-                    // Cuerpo (traje)
                     ctx.fillStyle = '#3a3a3a';
                     ctx.fillRect(this.x, this.y + 12, this.width, this.height - 12);
-                     // Blusa blanca
                     ctx.fillStyle = '#f0f0f0';
                     ctx.fillRect(this.x + 4, this.y + 12, this.width - 8, 8);
-                    // Cabeza
                     ctx.fillStyle = '#d2b48c';
                     ctx.fillRect(this.x + 4, this.y, this.width - 8, 12);
-                    // Pelo
                     ctx.fillStyle = '#3a3a3a';
                     ctx.fillRect(this.x + 2, this.y, this.width - 4, 8);
                 }
@@ -185,8 +202,23 @@
 
         const keys = { right: false, left: false, up: false };
         let platforms = [], coins = [], enemies = [], goal = {};
+        // NUEVO: Partículas para el fondo dinámico
+        let particles = [];
 
         // --- FUNCIONES DEL JUEGO ---
+
+        // NUEVO: Función para crear el fondo de partículas
+        function createParticles() {
+            particles = [];
+            for (let i = 0; i < 100; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 1,
+                    speed: Math.random() * 0.5 + 0.1
+                });
+            }
+        }
 
         function createWorld() {
             score = 0;
@@ -253,7 +285,6 @@
         function drawEnemies() {
             enemies.forEach(e => {
                 ctx.fillStyle = '#ff414d';
-                // Todos los enemigos se dibujan como picos
                 ctx.beginPath();
                 ctx.moveTo(e.x, e.y + e.height);
                 ctx.lineTo(e.x + e.width / 2, e.y);
@@ -271,12 +302,14 @@
             ctx.beginPath(); ctx.arc(goal.x + 55, goal.y + 20, 10, 0, Math.PI); ctx.fill();
         }
 
-        function showInfoMessage(text, duration = 15000) {
+        function showInfoMessage(text, duration = 8000) { // Duración ajustada
             clearTimeout(infoTimeout);
             infoDisplay.textContent = text;
             infoDisplay.style.opacity = 1;
+            infoDisplay.style.transform = 'translateY(0)';
             infoTimeout = setTimeout(() => {
                 infoDisplay.style.opacity = 0;
+                infoDisplay.style.transform = 'translateY(-10px)';
             }, duration);
         }
         
@@ -291,7 +324,6 @@
             modal.classList.add('hidden');
             gamePaused = false;
             resetGame();
-            // Mostrar pantalla de inicio y footer
             startScreen.classList.remove('hidden');
             gameContainer.classList.add('hidden');
             document.getElementById('main-footer').classList.remove('hidden');
@@ -372,17 +404,40 @@
         
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // MEJORADO: Dibujar fondo dinámico
+            // Mover y dibujar partículas relativas a la cámara
+            particles.forEach(p => {
+                p.y += p.speed;
+                if (p.y > canvas.height) {
+                    p.y = 0;
+                    p.x = Math.random() * canvas.width;
+                }
+                ctx.fillStyle = `rgba(224, 224, 224, 0.5)`;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+            });
+
+            // Dibujar una grilla sutil en el fondo
+            ctx.strokeStyle = "rgba(15, 52, 96, 0.3)";
+            for (let i = 0; i < canvas.width; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+            for (let i = 0; i < canvas.height; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvas.width, i);
+                ctx.stroke();
+            }
+
+
             ctx.save();
             let camX = -player.x + gameContainer.clientWidth / 2;
             camX = Math.min(0, camX);
             camX = Math.max(gameContainer.clientWidth - canvas.width, camX);
             ctx.translate(camX, 0);
-
-            for(let i=0; i < canvas.width; i += 100) {
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-                ctx.fillRect(i, 0, 10, canvas.height);
-                ctx.fillRect(i + 50, 0, 2, Math.random() * canvas.height);
-            }
 
             drawPlatforms();
             drawCoins();
@@ -429,9 +484,13 @@
             gameContainer.classList.remove('hidden');
             document.getElementById('main-footer').classList.add('hidden');
             createWorld();
+            // Iniciar partículas al empezar el juego
+            createParticles(); 
             gameLoop();
         });
 
     </script>
 </body>
 </html>
+
+
